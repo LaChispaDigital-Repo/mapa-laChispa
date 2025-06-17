@@ -1,5 +1,5 @@
-import React from 'react';
-import { useMapStore } from '../store/useMapStore';
+import React from "react";
+import { useMapStore } from "../store/useMapStore";
 
 export const FiltroJJVV: React.FC = () => {
   const filtroNombreJJVV = useMapStore((state) => state.filtroNombreJJVV);
@@ -21,5 +21,4 @@ export const FiltroJJVV: React.FC = () => {
       />
     </div>
   );
-
 };

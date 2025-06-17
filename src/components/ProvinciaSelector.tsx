@@ -2,22 +2,21 @@ import { useEffect } from "react";
 import { useMapStore, calculateCentroid } from "../store/useMapStore";
 
 export const ProvinciaSelector = () => {
-  // Obtener el estado de la región, comuna seleccionada, GeoJSON de la región y funciones para actualizar el estado
+  // Obtener el estado de la región, provincia seleccionada, GeoJSON de la región y funciones para actualizar el estado
   // desde la store de Zustand
-  const {
-    regionGeoJSON,
-    loading,
-    setPosition,
-    selectedRegion,
-    loadJuntasVecinos,
-    selectedProvince,
-    setSelectedProvince,
-  } = useMapStore();
 
-  // Variable para almacenar la lista de comunas de la región actual
+  const regionGeoJSON = useMapStore((state) => state.regionGeoJSON);
+  const loading = useMapStore((state) => state.loading);
+  const setPosition = useMapStore((state) => state.setPosition);
+  const selectedRegion = useMapStore((state) => state.selectedRegion);
+  const loadJuntasVecinos = useMapStore((state) => state.loadJuntasVecinos);
+  const selectedProvince = useMapStore((state) => state.selectedProvince);
+  const setSelectedProvince = useMapStore((state) => state.setSelectedProvince);
+
+  // Variable para almacenar la lista de provincias de la región actual
   // Se obtiene del GeoJSON de la región cargado en la store
   // Se usa un Map para eliminar duplicados y luego se convierte a un array de objetos con código y nombre
-  // Se ordena alfabéticamente por nombre de comuna
+  // Se ordena alfabéticamente por nombre de provincia
 
   const provinces = regionGeoJSON
     ? Array.from(
@@ -27,19 +26,19 @@ export const ProvinciaSelector = () => {
         .sort((a, b) => a.name.localeCompare(b.name))
     : [];
 
-  // Auto-resetear comuna inválida
+  // Auto-resetear provincia inválida
   useEffect(() => {
     if (selectedProvince && provinces.length > 0) {
       const provinceExists = provinces.some((c) => c.name === selectedProvince);
       if (!provinceExists) {
-        console.log(`Comuna ${selectedProvince} no existe en la nueva región, reseteando...`);
+        console.log(`provincia ${selectedProvince} no existe en la nueva región, reseteando...`);
         setSelectedProvince(null);
       }
     }
   }, [provinces, selectedProvince, setSelectedProvince]);
 
-  // Función para manejar el cambio de comuna que se llama al seleccionar una comuna del dropdown con el evento onChange
-  // Esta función actualiza el estado de la comuna seleccionada y centra el mapa en el centroide de la comuna
+  // Función para manejar el cambio de provincia que se llama al seleccionar una provincia del dropdown con el evento onChange
+  // Esta función actualiza el estado de la provincia seleccionada y centra el mapa en el centroide de la provincia
   // Actualiza la
 
   const handleProvinceChange = (provinceName: string | null) => {
@@ -49,11 +48,11 @@ export const ProvinciaSelector = () => {
 
     // Si se selecciona una provincia, centrar el mapa en su centroide
     if (provinceName && regionGeoJSON) {
-      // Calcular centroide real de la comuna
+      // Calcular centroide real de la provincia
       const provinceFeatures = regionGeoJSON.features.filter((f) => f.properties.t_prov_nom === provinceName);
 
       if (provinceFeatures.length > 0) {
-        // Calcular el centroide promedio de todas las features de la comuna
+        // Calcular el centroide promedio de todas las features de la provincia
         let totalLat = 0;
         let totalLng = 0;
         let count = 0;
@@ -73,7 +72,7 @@ export const ProvinciaSelector = () => {
         }
       }
     } else {
-      // Si no se selecciona ninguna comuna, resetear la posición al centroide de la región
+      // Si no se selecciona ninguna provincia, resetear la posición al centroide de la región
       // Volver al centroide de la región
       if (selectedRegion) {
         setPosition(selectedRegion.centroide);

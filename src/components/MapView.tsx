@@ -6,13 +6,17 @@ import "leaflet/dist/leaflet.css";
 import { JuntasVecinosLayer } from "./JuntasVecinosLayer";
 
 export const MapView = () => {
-  const { selectedRegion, regionGeoJSON, position, selectedUnidadVecinal, juntasVecinos, selectedCommune } =
-    useMapStore();
+  const selectedRegion = useMapStore((state) => state.selectedRegion);
+  const regionGeoJSON = useMapStore((state) => state.regionGeoJSON);
+  const position = useMapStore((state) => state.position);
+  const selectedUnidadVecinal = useMapStore((state) => state.selectedUnidadVecinal);
+  const juntasVecinos = useMapStore((state) => state.juntasVecinos);
+  const selectedCommune = useMapStore((state) => state.selectedCommune);
 
   return (
     <div className="map-container">
       {/* Mapa principal */}
-      <MapContainer center={position} zoom={10} className="map" key={`${position[0]}-${position[1]}`}>
+      <MapContainer center={position} zoom={9} className="map" key={`${position[0]}-${position[1]}`}>
         <LayersControl position="topright" key={`layers-${selectedRegion?.slug || "default"}`}>
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

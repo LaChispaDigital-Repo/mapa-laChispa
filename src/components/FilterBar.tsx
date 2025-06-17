@@ -6,7 +6,8 @@ import { FiltroJJVV } from "./FiltroJJVV";
 import { ProvinciaSelector } from "./ProvinciaSelector";
 
 export const FilterBar = () => {
-  const { clearFilters } = useMapStore();
+  const clearFilters = useMapStore((state) => state.clearFilters);
+
   // Esta función se encarga de limpiar la selección de región}
 
   return (

@@ -2,18 +2,16 @@ import { useEffect } from "react";
 import { useMapStore, calculateCentroid } from "../store/useMapStore";
 
 export const CommuneSelector = () => {
-  const {
-    regionGeoJSON,
-    selectedCommune,
-    setSelectedCommune,
-    loading,
-    setPosition,
-    selectedRegion,
-    loadCommuneData,
-    loadJuntasVecinos,
-    setSelectedUnidadVecinalData,
-    selectedProvince,
-  } = useMapStore();
+  const regionGeoJSON = useMapStore((state) => state.regionGeoJSON);
+  const selectedCommune = useMapStore((state) => state.selectedCommune);
+  const setSelectedCommune = useMapStore((state) => state.setSelectedCommune);
+  const loading = useMapStore((state) => state.loading);
+  const setPosition = useMapStore((state) => state.setPosition);
+  const selectedRegion = useMapStore((state) => state.selectedRegion);
+  const loadCommuneData = useMapStore((state) => state.loadCommuneData);
+  const loadJuntasVecinos = useMapStore((state) => state.loadJuntasVecinos);
+  const setSelectedUnidadVecinalData = useMapStore((state) => state.setSelectedUnidadVecinalData);
+  const selectedProvince = useMapStore((state) => state.selectedProvince);
 
   // Obtener comunas filtradas por provincia seleccionada
   const communes = regionGeoJSON

@@ -4,7 +4,10 @@ import { CustomBarChart } from "./CustomBarChart";
 import { Loader } from "./common/Loader";
 
 export const ShowInfo = () => {
-  const { selectedCommuneData, selectedUnidadVecinalData, clearFilters, loading } = useMapStore();
+  const selectedCommuneData = useMapStore((state) => state.selectedCommuneData);
+  const selectedUnidadVecinalData = useMapStore((state) => state.selectedUnidadVecinalData);
+  const clearFilters = useMapStore((state) => state.clearFilters);
+  const loading = useMapStore((state) => state.loading);
 
   if (!selectedUnidadVecinalData && !selectedCommuneData?.metadata?.totalesGenerales) {
     clearFilters();

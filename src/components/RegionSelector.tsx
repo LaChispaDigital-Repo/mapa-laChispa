@@ -4,10 +4,23 @@ import { useMapStore } from "../store/useMapStore";
 export const RegionSelector = () => {
   // Obtener el estado de la región, comuna seleccionada, GeoJSON de la región y funciones para actualizar el estado
   // desde la store de Zustand
-  const { loadRegions, regionList, selectedRegion, setSelectedRegion, loadRegionGeoJSON, loading } = useMapStore();
+  const regionList = useMapStore((state) => state.regionList);
+  const selectedRegion = useMapStore((state) => state.selectedRegion);
+  const setSelectedRegion = useMapStore((state) => state.setSelectedRegion);
+  const loadRegions = useMapStore((state) => state.loadRegions);
+  const loadRegionGeoJSON = useMapStore((state) => state.loadRegionGeoJSON);
+  const loading = useMapStore((state) => state.loading);
+  const setSelectedCommune = useMapStore((s) => s.setSelectedCommune);
+  const setSelectedProvince = useMapStore((s) => s.setSelectedProvince);
 
   // Cargar lista de regiones al montar el componente con useEffect
   // Esto se hace una sola vez para evitar múltiples llamadas innecesarias
+
+  useEffect(() => {
+    // Cada vez que cambia la región seleccionada, resetea comuna y provincia
+    setSelectedCommune(null);
+    setSelectedProvince(null);
+  }, [selectedRegion]);
 
   useEffect(() => {
     loadRegions();
@@ -27,6 +40,7 @@ export const RegionSelector = () => {
     if (region) {
       setSelectedRegion(region);
       loadRegionGeoJSON();
+      console.log("cargando el geojson de la región:", region.slug);
     }
   };
 

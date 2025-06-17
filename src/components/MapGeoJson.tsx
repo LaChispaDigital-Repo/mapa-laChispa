@@ -4,18 +4,29 @@ import type { FeatureCollection, Feature, Geometry, GeoJsonProperties } from "ge
 import type { LeafletMouseEvent } from "leaflet";
 
 export const MapGeoJson = () => {
-  const {
-    selectedRegion,
-    selectedCommune,
-    selectedUnidadVecinal,
-    getFilteredUVFeatures,
-    regionGeoJSON,
-    setSelectedUnidadVecinal,
-    setHoveredFeature,
-    geoJsonVersion,
-    loadCommuneData,
-    loadUnidadVecinalData,
-  } = useMapStore();
+  // const {
+  //   selectedRegion,
+  //   selectedCommune,
+  //   selectedUnidadVecinal,
+  //   getFilteredUVFeatures,
+  //   regionGeoJSON,
+  //   setSelectedUnidadVecinal,
+  //   setHoveredFeature,
+  //   geoJsonVersion,
+  //   loadCommuneData,
+  //   loadUnidadVecinalData,
+  // } = useMapStore();
+
+  const selectedRegion = useMapStore((state) => state.selectedRegion);
+  const selectedCommune = useMapStore((state) => state.selectedCommune);
+  const selectedUnidadVecinal = useMapStore((state) => state.selectedUnidadVecinal);
+  const getFilteredUVFeatures = useMapStore((state) => state.getFilteredUVFeatures);
+  const regionGeoJSON = useMapStore((state) => state.regionGeoJSON);
+  const setSelectedUnidadVecinal = useMapStore((state) => state.setSelectedUnidadVecinal);
+  const setHoveredFeature = useMapStore((state) => state.setHoveredFeature);
+  const geoJsonVersion = useMapStore((state) => state.geoJsonVersion);
+  const loadCommuneData = useMapStore((state) => state.loadCommuneData);
+  const loadUnidadVecinalData = useMapStore((state) => state.loadUnidadVecinalData);
 
   if (!regionGeoJSON || !selectedRegion) return null;
 

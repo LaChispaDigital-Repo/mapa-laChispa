@@ -21,7 +21,8 @@ const defaultIcon = L.icon({
 L.Marker.prototype.options.icon = defaultIcon;
 
 export const JuntasVecinosLayer = () => {
-  const { juntasVecinos, filtroNombreJJVV } = useMapStore();
+  const juntasVecinos = useMapStore((state) => state.juntasVecinos);
+  const filtroNombreJJVV = useMapStore((state) => state.filtroNombreJJVV);
 
   let juntasConCoordenadas = juntasVecinos.filter((junta) => junta.latitud !== null && junta.longitud !== null);
 

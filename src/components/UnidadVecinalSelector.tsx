@@ -3,14 +3,13 @@ import { useMapStore } from "../store/useMapStore";
 export const UnidadVecinalSelector = () => {
   // Obtener el estado de la región, comuna seleccionada, GeoJSON de la región y funciones para actualizar el estado
   // desde la store de Zustand
-  const {
-    regionGeoJSON,
-    selectedCommune,
-    selectedUnidadVecinal,
-    setSelectedUnidadVecinal,
-    loading,
-    loadUnidadVecinalData,
-  } = useMapStore();
+
+  const regionGeoJSON = useMapStore((state) => state.regionGeoJSON);
+  const selectedCommune = useMapStore((state) => state.selectedCommune);
+  const selectedUnidadVecinal = useMapStore((state) => state.selectedUnidadVecinal);
+  const setSelectedUnidadVecinal = useMapStore((state) => state.setSelectedUnidadVecinal);
+  const loading = useMapStore((state) => state.loading);
+  const loadUnidadVecinalData = useMapStore((state) => state.loadUnidadVecinalData);
 
   // Obtener unidades vecinales disponibles (filtradas por comuna si está seleccionada)
   const unidadesVecinales = regionGeoJSON
