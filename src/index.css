@@ -1,38 +1,18 @@
 @import 'leaflet/dist/leaflet.css';
 @import "tailwindcss"; 
+@plugin "daisyui" {
+    themes: cupcake, bumblebee, emerald, corporate, synthwave, retro, cyberpunk, valentine, fantasy, winter, autumn, forest, business, acid, dracula, black, lofi, pastel, wireframe, night, coffee, lemonade, dim, aqua, light, dark, garden, luxury, fantasy, retro, synthwave, cyberpunk, valentine, winter, autumn, forest, business, acid, dracula, black, lofi, pastel, wireframe, night, coffee, lemonade;
+}
+
+
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-/* 
-*{
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-} */
-
-/* Selectores */
-
-.selector-container {
-  padding: 0.5rem;
-  background: #f0f0f0;
-  color: black;
-  border-radius: 0.1rem;
-}
-
-.selector {
-  width: 100%;
-  background: white;
-  padding: 0.5rem;
 }
 
 .map {
@@ -50,14 +30,6 @@
   width: 100%;
 }
 
-
-.uv-info-panel{
-  background-color: white;
-  color: black;
-  padding: 1rem;
-  font-size: 0.8rem;
-}
-
 .filterbar-container{
   display: grid;
   padding: 0.5rem;
@@ -65,37 +37,3 @@
   gap: 0.5rem;
   align-items: center;
 }
-
-.btn{
-  padding: 1rem;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 0.2rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-.btn:hover{
-  background-color: #0056b3;
-}
-
-.show-info-container{
-  display: flex;
-  height: 100%;
-  flex-direction: column;
-  justify-content: space-evenly;
-  padding: 1rem;
-  background-color: #f8f9fa;
-  border-radius: 0.2rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.info-container{
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-}
-
-/* ShowInfoComponent */

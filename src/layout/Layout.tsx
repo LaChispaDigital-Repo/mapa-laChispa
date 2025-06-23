@@ -1,10 +1,10 @@
-import type { ReactNode } from "react";
 import "./Layout.css";
-import { FilterBar } from "../components/FilterBar";
-import { MapView } from "../components/MapView";
-import { ShowInfo } from "../components/ShowInfo";
+import { FilterBar } from "../components/FilterBar/FilterBar";
+import { MapView } from "../components/Map/MapView";
+import { ShowInfo } from "../components/DataDisplay/ShowInfo";
+import { Footer } from "../components/Footer";
 
-export const Layout: React.FC<{ children: ReactNode }> = () => {
+export const Layout: React.FC = () => {
   return (
     <div className="my-container">
       <header className="bg-gray-800 text-white">
@@ -12,12 +12,9 @@ export const Layout: React.FC<{ children: ReactNode }> = () => {
       </header>
       <main className="main-content">
         <MapView />
-
         <ShowInfo />
       </main>
-      <footer className="bg-gray-800 text-white text-center p-4">
-        <p>© 2025 La Chispa Digital. Todos los derechos reservados.</p>
-      </footer>
+      <Footer />
     </div>
   );
 };
