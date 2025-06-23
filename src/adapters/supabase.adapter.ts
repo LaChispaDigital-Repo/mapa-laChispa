@@ -55,7 +55,7 @@ function adaptJuntaVecinal(junta: any) {
   return {
     id: junta.id,
     lat: junta.lat,
-    lng: junta.lng, // Corregido: usar 'lng' en lugar de 'lon'
+    lng: junta.lng, // Se usa junta.lng basado en tus cambios locales
     nombre: junta.nombre,
     direccion: junta.direccion,
     geometry: junta.geometry || null,

@@ -67,7 +67,5 @@ export interface MapStore {
   // Async Actions
   loadRegions: () => Promise<void>;
   loadRegionGeoJSON: () => Promise<void>;
-  // loadJuntasVecinos: (communCode: string) => Promise<void>;
-
   clearFilters(): () => void;
 }
