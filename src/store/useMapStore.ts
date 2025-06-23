@@ -1,8 +1,19 @@
 import { create } from "zustand";
-import type { RegionIndexEntry, UnidadVecinalGeoJSON } from "../components/region-selector.inteface";
-import type { JuntaVecinal } from "../components/juntas-vecinos.interface";
+import type {
+  RegionGeoData,
+  RegionIndexEntry,
+  Comuna,
+  UnidadVecinal,
+  DatosDemograficos,
+} from "../types/region-selector.inteface";
 import type { MapStore } from "./map-store.interface";
 import { calculateCentroid } from "./calculate.centroid.helper";
+import { fetchRegionGeoData } from "../utils/regionFetcher";
+import { toGeoJSON } from "../adapters/supabase.adapter";
+import {
+  adaptDemographicDataForPieGraphic,
+  adaptDemographicDataForBarGraphic,
+} from "../adapters/demographicDataForGraphic.adapter";
 
 export const useMapStore = create<MapStore>((set, get) => ({
   juntasVecinos: [],
@@ -17,18 +28,21 @@ export const useMapStore = create<MapStore>((set, get) => ({
   selectedUnidadVecinal: null,
   hoveredFeature: null,
   geoJsonVersion: 0,
-  selectedCommuneData: null,
-  selectedUnidadVecinalData: null,
   filtroNombreJJVV: "",
+  regionRawData: null as RegionGeoData | null,
+  // provincias: [],
+  // comunas: [],
+  // unidadesVecinales: [],
+  demographicData: null,
+  pieData: [],
+  barData: [],
 
-  setSelectedProvince: (province) => set({ selectedProvince: province }),
-  setSelectedCommune: (commune) => set({ selectedCommune: commune, selectedUnidadVecinal: null }),
-  setSelectedUnidadVecinal: (uv) => set({ selectedUnidadVecinal: uv }),
+  setSelectedProvince: (province) =>
+    set({ selectedProvince: province, selectedCommune: null, selectedUnidadVecinal: null }),
+  setSelectedCommune: (commune: Comuna | null) => set({ selectedCommune: commune, selectedUnidadVecinal: null }),
+  setSelectedUnidadVecinal: (uv: UnidadVecinal | null) => set({ selectedUnidadVecinal: uv }),
   setHoveredFeature: (feature) => set({ hoveredFeature: feature }),
-  setCommuneList: (communes) => set({ communeList: communes }),
-  setSelectedCommuneData: (data) => set({ selectedCommuneData: data }),
-  setSelectedUnidadVecinalData: (data) => set({ selectedUnidadVecinalData: data }),
-  setSelectedJuntasVecinos: (data) => set({ juntasVecinos: data }),
+  setJuntasVecinos: (data) => set({ juntasVecinos: data }),
 
   setRegionGeoJSON: (geoJSON) =>
     set((state) => ({
@@ -39,6 +53,7 @@ export const useMapStore = create<MapStore>((set, get) => ({
   setSelectedRegion: (region) => {
     set({
       selectedRegion: region,
+      selectedProvince: null,
       selectedCommune: null,
       selectedUnidadVecinal: null,
       position: region?.centroide || [-33.048, -71.456],
@@ -50,19 +65,69 @@ export const useMapStore = create<MapStore>((set, get) => ({
   setPosition: (position) => set({ position }),
   setFiltroNombreJJVV: (filtro) => set({ filtroNombreJJVV: filtro }),
 
+  setDemographicData: (data: DatosDemograficos | null) => {
+    set({
+      demographicData: data,
+      pieData: data ? adaptDemographicDataForPieGraphic(data) : [],
+      barData: data ? adaptDemographicDataForBarGraphic(data) : [],
+    });
+  },
+
+  // Getter optimizado para obtener provincias de la región actual
+  getProvincias: () => {
+    const { regionRawData } = get();
+    return regionRawData?.provincias || [];
+  },
+
+  // Getter para obtener comunas filtradas por provincia
+  getComunas: () => {
+    const { regionRawData, selectedProvince } = get();
+    if (!regionRawData) return [];
+
+    if (selectedProvince) {
+      const provincia = regionRawData.provincias.find((p) => p.id_provincia === selectedProvince);
+      return provincia?.comunas || [];
+    }
+
+    return regionRawData.provincias.flatMap((p) => p.comunas);
+  },
+
+  // Getter para obtener unidades vecinales filtradas
+  getUnidadesVecinales: () => {
+    const { regionRawData, selectedProvince, selectedCommune } = get();
+    if (!regionRawData) return [];
+
+    let comunas = regionRawData.provincias.flatMap((p) => p.comunas);
+
+    if (selectedProvince) {
+      const provincia = regionRawData.provincias.find((p) => p.id_provincia === selectedProvince);
+      comunas = provincia?.comunas || [];
+    }
+
+    if (selectedCommune) {
+      comunas = comunas.filter((c) => c.id_comuna === selectedCommune.id_comuna);
+    }
+    return comunas.flatMap((c) => c.unidades_vecinales);
+  },
+
+  // FILTROS DE UNIDADES VECINALES PARA EL MAPA
+
   getFilteredUVFeatures: () => {
     const { regionGeoJSON, selectedCommune, selectedUnidadVecinal, selectedProvince } = get();
     if (!regionGeoJSON) return [];
+
     let features = regionGeoJSON.features;
+
     if (selectedProvince) {
-      features = features.filter((f) => f.properties.t_prov_nom === selectedProvince);
+      features = features.filter((f) => f.properties.id_provincia === selectedProvince);
     }
     if (selectedCommune) {
-      features = features.filter((f) => f.properties.t_com === selectedCommune);
+      features = features.filter((f) => f.properties.id_comuna === selectedCommune.id_comuna);
     }
     if (selectedUnidadVecinal) {
-      features = features.filter((f) => f.properties.t_uv_nom === selectedUnidadVecinal);
+      features = features.filter((f) => f.properties.nombre_uv === selectedUnidadVecinal.nombre);
     }
+
     return features;
   },
 
@@ -82,67 +147,26 @@ export const useMapStore = create<MapStore>((set, get) => ({
   },
 
   loadRegionGeoJSON: async () => {
-    const { selectedRegion, setLoading, setRegionGeoJSON } = get();
+    const { selectedRegion, setLoading } = get();
     setLoading(true);
     try {
       if (!selectedRegion) throw new Error("No region selected");
-      const res = await fetch(`/geojson/${selectedRegion.slug}.json`);
-      if (!res.ok) throw new Error(`Error ${res.status}: No se pudo cargar el archivo ${selectedRegion.slug}.json`);
-      const data: UnidadVecinalGeoJSON = await res.json();
-      setRegionGeoJSON(data);
-    } catch (error) {
-      console.error("Error cargando región:", error);
-      setRegionGeoJSON(null);
-    } finally {
-      setLoading(false);
-    }
-  },
 
-  loadCommuneData: async (communeCode: string): Promise<void> => {
-    const { setSelectedCommuneData, setLoading } = get();
-    setLoading(true);
-    try {
-      const res = await fetch(`datos/${communeCode}.json`);
-      if (!res.ok) throw new Error(`Error ${res.status}: No se pudo cargar los datos de la comuna ${communeCode}`);
-      const data = await res.json();
-      setSelectedCommuneData(data);
-    } catch (error) {
-      console.error("Error cargando datos de la comuna:", error);
-      setSelectedCommuneData(null);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  },
+      // Obtener datos de Supabase usando el adapter
+      const rawData = await fetchRegionGeoData(selectedRegion.slug);
+      console.log("Datos de Supabase adaptados:", rawData);
 
-  loadUnidadVecinalData: async (unidadVecinalName: string): Promise<void> => {
-    const { setSelectedUnidadVecinalData, selectedCommuneData, setLoading } = get();
-    setLoading(true);
-    try {
-      const data = selectedCommuneData?.datos?.find(
-        (uv: any) =>
-          uv["NOMBRE UNIDAD VECINAL"].toString().trim().toLowerCase() === unidadVecinalName.trim().toLowerCase()
-      );
-      setSelectedUnidadVecinalData(data || null);
-    } catch (error) {
-      console.error("Error cargando datos de la unidad vecinal:", error);
-      setSelectedUnidadVecinalData(null);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  },
+      // Convertir a GeoJSON usando el adapter
+      const geoJSON = toGeoJSON(rawData, selectedRegion.id, selectedRegion.name);
 
-  loadJuntasVecinos: async (communCode: string): Promise<void> => {
-    const { setSelectedJuntasVecinos, setLoading } = get();
-    setLoading(true);
-    try {
-      const res = await fetch(`/datos/${communCode}-JJVV.json`);
-      if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
-      const data: JuntaVecinal[] = await res.json();
-      setSelectedJuntasVecinos(data);
+      set({
+        regionGeoJSON: geoJSON,
+        regionRawData: rawData,
+        geoJsonVersion: get().geoJsonVersion + 1,
+      });
     } catch (error) {
-      console.error("Error cargando juntas de vecinos:", error);
+      console.error("Error cargando datos de la región desde Supabase:", error);
+      set({ regionGeoJSON: null, regionRawData: null });
     } finally {
       setLoading(false);
     }
@@ -155,11 +179,13 @@ export const useMapStore = create<MapStore>((set, get) => ({
       selectedCommune: null,
       selectedUnidadVecinal: null,
       regionGeoJSON: null,
+      regionRawData: null,
       juntasVecinos: [],
       filtroNombreJJVV: "",
-      selectedCommuneData: null,
-      selectedUnidadVecinalData: null,
-      // No limpiar position para que el mapa no se mueva
+      position: [-33.048, -71.456],
+      demographicData: null,
+      pieData: [],
+      barData: [],
     }),
 }));
 

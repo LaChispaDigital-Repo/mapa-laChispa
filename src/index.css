@@ -1,20 +1,19 @@
 @import 'leaflet/dist/leaflet.css';
 @import "tailwindcss"; 
+@plugin "daisyui" {
+    themes: cupcake, bumblebee, emerald, corporate, synthwave, retro, cyberpunk, valentine, fantasy, winter, autumn, forest, business, acid, dracula, black, lofi, pastel, wireframe, night, coffee, lemonade, dim, aqua, light, dark, garden, luxury, fantasy, retro, synthwave, cyberpunk, valentine, winter, autumn, forest, business, acid, dracula, black, lofi, pastel, wireframe, night, coffee, lemonade;
+}
+
+
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
-
 
 .map {
   flex: 1;
@@ -30,8 +29,6 @@
   height: 100%;
   width: 100%;
 }
-
-
 
 .filterbar-container{
   display: grid;
