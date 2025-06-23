@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { useMapStore } from "../../store/useMapStore";
 
 export const UnidadVecinalSelector = () => {
