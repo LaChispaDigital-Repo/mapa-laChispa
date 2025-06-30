@@ -9,25 +9,39 @@ import { AddressSearch } from "./AdressSearch";
 export const FilterBar = () => {
   const clearFilters = useMapStore((state) => state.clearFilters);
 
-  // Esta función se encarga de limpiar la selección de región}
-
   return (
-    <div className="filterbar-container">
-      <RegionSelector />
-      <ProvinceSelector />
-      <CommuneSelector />
-      <UnidadVecinalSelector />
-      <FiltroJJVV />
-      {/* Adress Search me arroja problema de CORS */}
-      <AddressSearch />
-      <div>
-        <button onClick={clearFilters()} className="btn btn-info w-full">
+    <div className="w-full p-2">
+      {/* Mobile: Collapse menu */}
+      <div className="lg:hidden">
+        <div className="collapse collapse-arrow bg-base-200">
+          <input type="checkbox" />
+          <div className="collapse-title text-md font-medium">Filtros</div>
+          <div className="collapse-content flex flex-col gap-2">
+            <RegionSelector />
+            <ProvinceSelector />
+            <CommuneSelector />
+            <UnidadVecinalSelector />
+            <FiltroJJVV />
+            <AddressSearch />
+            <button onClick={clearFilters()} className="btn btn-info">
+              Limpiar selección
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop: Grid layout */}
+      <div className="hidden lg:grid lg:grid-cols-7 lg:gap-2 items-center">
+        <RegionSelector />
+        <ProvinceSelector />
+        <CommuneSelector />
+        <UnidadVecinalSelector />
+        <FiltroJJVV />
+        <AddressSearch />
+        <button onClick={clearFilters()} className="btn btn-info">
           Limpiar selección
         </button>
       </div>
     </div>
   );
 };
-
-// className="w-full px-3 py-2 bg-slate-700 text-gray-200 border border-slate-600 rounded-md shadow-sm
-// focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm placeholder-slate-400">

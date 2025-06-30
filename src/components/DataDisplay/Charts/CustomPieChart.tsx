@@ -27,7 +27,7 @@ export const CustomPieChart = ({ data, colors = ["#0088FE", "#00C49F"] }: Custom
             data={data}
             cx="50%"
             cy="50%"
-            outerRadius={110}
+            outerRadius={100}
             fill="#8884d8"
             dataKey="value"
             label={label}

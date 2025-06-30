@@ -5,16 +5,19 @@ import type { LeafletMouseEvent } from "leaflet";
 import { mapPropsToUnidadVecinalAdapter } from "../../adapters/mapPropsUnidadVecinal.adapter";
 
 export const GeoJsonFeatures = () => {
-  const selectedRegion = useMapStore((state) => state.selectedRegion);
-  const selectedProvince = useMapStore((state) => state.selectedProvince);
-  const selectedCommune = useMapStore((state) => state.selectedCommune);
-  const selectedUnidadVecinal = useMapStore((state) => state.selectedUnidadVecinal);
-  const getFilteredUVFeatures = useMapStore((state) => state.getFilteredUVFeatures);
-  const regionGeoJSON = useMapStore((state) => state.regionGeoJSON);
-  const setSelectedUnidadVecinal = useMapStore((state) => state.setSelectedUnidadVecinal);
-  const setHoveredFeature = useMapStore((state) => state.setHoveredFeature);
-  const geoJsonVersion = useMapStore((state) => state.geoJsonVersion);
-  const setGraphicData = useMapStore((state) => state.setDemographicData);
+  // Obtener estados del store
+  const {
+    selectedRegion,
+    selectedProvince,
+    selectedCommune,
+    selectedUnidadVecinal,
+    getFilteredUVFeatures,
+    regionGeoJSON,
+    setSelectedUnidadVecinal,
+    setHoveredFeature,
+    geoJsonVersion,
+    setDemographicData,
+  } = useMapStore();
 
   if (!regionGeoJSON || !selectedRegion) return null;
 
@@ -27,68 +30,78 @@ export const GeoJsonFeatures = () => {
     selectedCommune?.id_comuna || "all"
   }-${selectedUnidadVecinal?.id || "all"}-v${geoJsonVersion}`;
 
+  // Estilo base para todas las features
+  const baseStyle = {
+    weight: 2,
+    opacity: 0.8,
+    fillOpacity: 0.2,
+    color: "#3388ff",
+    fillColor: "#3388ff",
+  };
+
+  // Estilo para feature seleccionada
+  const selectedStyle = {
+    weight: 4,
+    opacity: 1,
+    fillOpacity: 0.4,
+    color: "#ff6b35",
+    fillColor: "#ff6b35",
+  };
+
+  // Estilo para hover
+  const hoverStyle = {
+    weight: 3,
+    opacity: 1,
+    fillOpacity: 0.3,
+    color: "#ff9f43",
+    fillColor: "#ff9f43",
+  };
+
   return (
     <GeoJSON
       key={geoJsonKey}
       data={filteredFeatures}
       style={(feature) => {
         const isSelected = feature?.properties?.id_uv === selectedUnidadVecinal?.id;
-        return {
-          color: isSelected ? "#ff6b35" : "#3388ff",
-          weight: isSelected ? 3 : 3,
-          opacity: isSelected ? 1 : 0.8,
-          fillOpacity: isSelected ? 0.4 : 0.2,
-          fillColor: isSelected ? "#ff6b35" : "#3388ff",
-        };
+        return isSelected ? selectedStyle : baseStyle;
       }}
       onEachFeature={(feature, layer) => {
         const props = feature.properties;
 
         if (props?.id_uv) {
-          // Eventos de mouse simplificados
+          // Eventos de mouse
           layer.on({
             click: (e: LeafletMouseEvent) => {
               e.originalEvent.stopPropagation();
               const uvID = props.id_uv;
               const isCurrentlySelected = selectedUnidadVecinal?.id === uvID;
-              // setSelectedUnidadVecinal(isCurrentlySelected ? null : mapPropsToUnidadVecinal(props));
               const newUV = isCurrentlySelected ? null : mapPropsToUnidadVecinalAdapter(props);
+
               setSelectedUnidadVecinal(newUV);
-              setGraphicData(newUV?.datos_demograficos || null);
+              setDemographicData(newUV?.datos_demograficos || selectedCommune?.datos_demograficos || null);
+
+              // Forzar actualización de estilos
+              (layer as L.Path).setStyle(isCurrentlySelected ? baseStyle : selectedStyle);
             },
 
             mouseover: (e: LeafletMouseEvent) => {
               const layer = e.target as L.Path;
-
-              // Cambiar estilo en hover si no está seleccionada
               if (props.id_uv !== selectedUnidadVecinal?.id) {
-                layer.setStyle({
-                  color: "#ff9f43",
-                  weight: 2,
-                  fillOpacity: 0.3,
-                });
+                layer.setStyle(hoverStyle);
               }
-
               setHoveredFeature(feature as any);
             },
 
             mouseout: (e: LeafletMouseEvent) => {
               const layer = e.target as L.Path;
-
-              // Restaurar estilo original si no está seleccionada
               if (props.id_uv !== selectedUnidadVecinal?.id) {
-                layer.setStyle({
-                  color: "#3388ff",
-                  weight: 3,
-                  fillOpacity: 0.2,
-                });
+                layer.setStyle(baseStyle);
               }
-
               setHoveredFeature(null);
             },
           });
 
-          // Tooltip actualizado con las nuevas propiedades
+          // Tooltip
           layer.bindTooltip(
             `<div style="font-family: Arial, sans-serif; min-width: 200px;">
               <strong style="color: #2c3e50; font-size: 14px;">UV ${props.numero_uv}: ${props.nombre_uv}</strong>

@@ -4,8 +4,6 @@
     themes: cupcake, bumblebee, emerald, corporate, synthwave, retro, cyberpunk, valentine, fantasy, winter, autumn, forest, business, acid, dracula, black, lofi, pastel, wireframe, night, coffee, lemonade, dim, aqua, light, dark, garden, luxury, fantasy, retro, synthwave, cyberpunk, valentine, winter, autumn, forest, business, acid, dracula, black, lofi, pastel, wireframe, night, coffee, lemonade;
 }
 
-
-
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   background-color: #242424;
@@ -17,10 +15,10 @@
 
 .map {
   flex: 1;
-  height: auto;
+  height: 100%;
   z-index: 1;
   border-radius: 0.2rem;
-  border: solid 1px #ccc;
+  border: solid 1px #ccc;  
 }
 
 .map-container {
@@ -28,12 +26,4 @@
   flex-direction: row;
   height: 100%;
   width: 100%;
-}
-
-.filterbar-container{
-  display: grid;
-  padding: 0.5rem;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 0.5rem;
-  align-items: center;
 }

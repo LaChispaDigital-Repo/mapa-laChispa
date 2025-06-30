@@ -9,16 +9,23 @@ export const ShowInfo = () => {
   const demographicData = useMapStore((state) => state.demographicData);
   const pieData = useMapStore((state) => state.pieData);
   const barData = useMapStore((state) => state.barData);
-  const totalPeople = useMapStore((state) => state.demographicData?.tot_personas || 0);
+  const totalPeople = useMapStore((state) => state.demographicData?.tot_personas || null);
   const selectedUnidadVecinal = useMapStore((state) => state.selectedUnidadVecinal);
   const selectedCommune = useMapStore((state) => state.selectedCommune);
 
-  if (!demographicData) {
+  if (!selectedCommune)
+    return (
+      <div className="flex flex-col items-center justify-center h-full p-10 text-center text-gray-700">
+        <h1 className="text-2xl font-semibold">Seleccione una comuna para ver la información demográfica</h1>
+      </div>
+    );
+
+  if (!demographicData || !totalPeople) {
     clearFilters();
     return (
       <div className="flex flex-col items-center justify-center h-full p-10 text-center text-gray-700">
-        <h1 className="text-2xl font-semibold">Selecciona una unidad vecinal o comuna válida</h1>
-        <p className="m-5 p-5 text-gray-500 border border-dashed">Aquí se mostrará la información demográfica.</p>
+        <h1 className="text-2xl font-semibold">Actualmente no existen datos para la selección</h1>
+        {/* <p className="m-5 p-5 text-gray-500 border border-dashed">Aquí se mostrará la información demográfica.</p> */}
       </div>
     );
   }
@@ -29,20 +36,22 @@ export const ShowInfo = () => {
     : `Información sobre la comuna de: ${selectedCommune?.nombre_comuna}`;
 
   if (loading) {
-    return <Loader center text="AHORAAAAAAAAAAAAA" />;
+    return <Loader center />;
   }
   return (
     <div className="flex flex-col h-full">
-      <h1 className="text-black text-center text-2xl py-5 my-5">{title}</h1>
-      <div className="grid grid-cols-3 md:grid-cols-3 w-full px-5 gap-6">
-        <div className="flex flex-col gap-4 justify-center items-center">
-          <strong className="text-xl md:text-2xl font-semibold text-gray-700 text-center">Total de personas</strong>
-          <h1 className="text-4xl md:text-5xl font-bold text-blue-600">{totalPeople}</h1>
+      <h1 className="text-black text-center text-1xl lg:py-3 sm:py-2 sm:my-2">{title}</h1>
+      <div className="grid not-[]:w-full px-5 gap-6">
+        <div className="grid grid-cols-1">
+          <div className="flex flex-col gap-4 justify-center items-center">
+            <strong className="text-1xl font-semibold text-gray-700 text-center">Total de personas</strong>
+            <h1 className="text-2xl font-bold text-blue-600">{totalPeople}</h1>
+          </div>
+          <div className="">
+            <CustomPieChart data={pieData} />
+          </div>
         </div>
-        <div className="col-span-2">
-          <CustomPieChart data={pieData} />
-        </div>
-        <div className="col-span-3">
+        <div className="">
           <CustomBarChart data={barData} />
         </div>
       </div>

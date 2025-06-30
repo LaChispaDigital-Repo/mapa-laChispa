@@ -11,8 +11,12 @@ export const Layout: React.FC = () => {
         <FilterBar />
       </header>
       <main className="main-content">
-        <MapView />
-        <ShowInfo />
+        <div className="flex-1">
+          <MapView />
+        </div>
+        <div className="bg-white border-t border-gray-200">
+          <ShowInfo />
+        </div>
       </main>
       <Footer />
     </div>

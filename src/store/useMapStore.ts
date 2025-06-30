@@ -1,14 +1,8 @@
 import { create } from "zustand";
-import type {
-  RegionGeoData,
-  RegionIndexEntry,
-  Comuna,
-  UnidadVecinal,
-  DatosDemograficos,
-} from "../types/region-selector.inteface";
+import type { RegionGeoData, Comuna, UnidadVecinal, DatosDemograficos } from "../types/region-selector.inteface";
 import type { MapStore } from "./map-store.interface";
 import { calculateCentroid } from "./calculate.centroid.helper";
-import { fetchRegionGeoData } from "../utils/regionFetcher";
+import { fetchRegionGeoData, fetchRegions } from "../utils/regionFetcher";
 import { toGeoJSON } from "../adapters/supabase.adapter";
 import {
   adaptDemographicDataForPieGraphic,
@@ -22,7 +16,11 @@ export const useMapStore = create<MapStore>((set, get) => ({
   juntasVecinos: [],
   filteredJuntasVecinos: [],
   selectedJuntaVecinal: null,
-  
+
+  // Refactorizar, desacoplar lógica Erick
+
+  // --------------------------------------------------------------------------
+
   // Métodos para manipular la referencia al mapa
   setMapInstance: (map: any) => {
     mapInstance = map;
@@ -32,46 +30,49 @@ export const useMapStore = create<MapStore>((set, get) => ({
       console.log("flyTo disponible:", typeof mapInstance.flyTo);
     }
   },
-  
+
   getMapInstance: () => {
     console.log("Solicitando instancia de mapa:", !!mapInstance);
     return mapInstance;
   },
-  
+
   // Método para centrar el mapa en coordenadas específicas
   flyToLocation: (lat: number, lng: number, zoom: number = 16) => {
     console.log("flyToLocation llamado con:", lat, lng, zoom);
     console.log("mapInstance disponible:", !!mapInstance);
-    
+
     if (mapInstance) {
       console.log("Tipo de mapInstance:", typeof mapInstance);
       console.log("Métodos disponibles en mapa:", Object.getOwnPropertyNames(mapInstance));
-      console.log("flyTo existe:", 'flyTo' in mapInstance);
+      console.log("flyTo existe:", "flyTo" in mapInstance);
       console.log("Tipo de flyTo:", typeof mapInstance.flyTo);
     }
-    
-    if (mapInstance && typeof mapInstance.flyTo === 'function') {
-      console.log('Ejecutando flyTo a:', lat, lng, 'con zoom:', zoom);
+
+    if (mapInstance && typeof mapInstance.flyTo === "function") {
+      console.log("Ejecutando flyTo a:", lat, lng, "con zoom:", zoom);
       try {
         mapInstance.flyTo([lat, lng], zoom, {
           animate: true,
-          duration: 1.5
+          duration: 1.5,
         });
-        console.log('flyTo ejecutado exitosamente');
+        console.log("flyTo ejecutado exitosamente");
         return true;
       } catch (error) {
-        console.error('Error en flyTo:', error);
+        console.error("Error en flyTo:", error);
         return false;
       }
     } else {
-      console.warn('No se puede volar: mapa no disponible o flyTo no es función');
-      console.warn('mapInstance:', mapInstance);
+      console.warn("No se puede volar: mapa no disponible o flyTo no es función");
+      console.warn("mapInstance:", mapInstance);
       if (mapInstance) {
-        console.warn('flyTo method:', mapInstance.flyTo);
+        console.warn("flyTo method:", mapInstance.flyTo);
       }
       return false;
     }
   },
+
+  // -----------------------------------------------------------
+
   regionList: [],
   regionGeoJSON: null,
   selectedRegion: null,
@@ -85,12 +86,10 @@ export const useMapStore = create<MapStore>((set, get) => ({
   geoJsonVersion: 0,
   filtroNombreJJVV: "",
   regionRawData: null as RegionGeoData | null,
-  // provincias: [],
-  // comunas: [],
-  // unidadesVecinales: [],
   demographicData: null,
   pieData: [],
   barData: [],
+  searchPosition: null,
 
   setSelectedProvince: (province) =>
     set({ selectedProvince: province, selectedCommune: null, selectedUnidadVecinal: null }),
@@ -100,6 +99,7 @@ export const useMapStore = create<MapStore>((set, get) => ({
   setJuntasVecinos: (data) => set({ juntasVecinos: data, filteredJuntasVecinos: data }),
   setFilteredJuntasVecinos: (juntas) => set({ filteredJuntasVecinos: juntas }),
   setSelectedJuntaVecinal: (junta) => set({ selectedJuntaVecinal: junta }),
+  setSearchPosition: (pos: any) => set({ searchPosition: pos }),
 
   setRegionGeoJSON: (geoJSON) =>
     set((state) => ({
@@ -133,15 +133,13 @@ export const useMapStore = create<MapStore>((set, get) => ({
       set({ filteredJuntasVecinos: juntasVecinos });
     }
   },
-  
+
   getFilteredJuntasVecinos: () => {
     const { filtroNombreJJVV, juntasVecinos } = get();
     if (!filtroNombreJJVV || filtroNombreJJVV.trim() === "") {
       return juntasVecinos;
     }
-    return juntasVecinos.filter((junta) =>
-      junta.nombre.toLowerCase().includes(filtroNombreJJVV.toLowerCase().trim())
-    );
+    return juntasVecinos.filter((junta) => junta.nombre.toLowerCase().includes(filtroNombreJJVV.toLowerCase().trim()));
   },
 
   setDemographicData: (data: DatosDemograficos | null) => {
@@ -192,7 +190,7 @@ export const useMapStore = create<MapStore>((set, get) => ({
   // FILTROS DE UNIDADES VECINALES PARA EL MAPA
 
   getFilteredUVFeatures: () => {
-    const { regionGeoJSON, selectedCommune, selectedUnidadVecinal, selectedProvince } = get();
+    const { regionGeoJSON, selectedCommune, selectedProvince } = get();
     if (!regionGeoJSON) return [];
 
     let features = regionGeoJSON.features;
@@ -203,9 +201,6 @@ export const useMapStore = create<MapStore>((set, get) => ({
     if (selectedCommune) {
       features = features.filter((f) => f.properties.id_comuna === selectedCommune.id_comuna);
     }
-    if (selectedUnidadVecinal) {
-      features = features.filter((f) => f.properties.nombre_uv === selectedUnidadVecinal.nombre);
-    }
 
     return features;
   },
@@ -214,10 +209,8 @@ export const useMapStore = create<MapStore>((set, get) => ({
     const { setRegionList, setLoading } = get();
     setLoading(true);
     try {
-      const res = await fetch("/geojson/regiones.json");
-      if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
-      const data: RegionIndexEntry[] = await res.json();
-      setRegionList(data);
+      const res = await fetchRegions();
+      setRegionList(res);
     } catch (error) {
       console.error("Error cargando regiones:", error);
     } finally {
@@ -230,7 +223,6 @@ export const useMapStore = create<MapStore>((set, get) => ({
     setLoading(true);
     try {
       if (!selectedRegion) throw new Error("No region selected");
-
       // Obtener datos de Supabase usando el adapter
       const rawData = await fetchRegionGeoData(selectedRegion.slug);
       console.log("Datos de Supabase adaptados:", rawData);
