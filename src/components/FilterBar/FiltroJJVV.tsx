@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { useMapStore } from "../../store/useMapStore";
-import type { JuntaVecinal as JJVV } from "../../types/region-selector.inteface";
+import type { JuntaVecinal as JJVV } from "../../types/interfaces";
 
 export const FiltroJJVV: React.FC = () => {
   const filtroNombreJJVV = useMapStore((state) => state.filtroNombreJJVV);
@@ -70,31 +70,31 @@ export const FiltroJJVV: React.FC = () => {
   }, [filteredJuntasVecinos, filtroNombreJJVV]);
 
   const handleSelectJJVV = (jjvv: JJVV) => {
-    console.log('Seleccionando junta:', jjvv.nombre, 'Coordenadas:', jjvv.lat, jjvv.lng);
-    
+    console.log("Seleccionando junta:", jjvv.nombre, "Coordenadas:", jjvv.lat, jjvv.lng);
+
     // Guardar la junta seleccionada en el store
-    setSelectedJuntaVecinal(jjvv); 
-    
+    setSelectedJuntaVecinal(jjvv);
+
     // Llamar directamente a flyToLocation para centrar el mapa
     const flyToLocation = useMapStore.getState().flyToLocation;
     if (jjvv.lat && jjvv.lng) {
-      console.log('Intentando volar a:', jjvv.lat, jjvv.lng);
+      console.log("Intentando volar a:", jjvv.lat, jjvv.lng);
       const success = flyToLocation(jjvv.lat, jjvv.lng, 16);
-      console.log('Resultado de flyTo:', success);
-      
+      console.log("Resultado de flyTo:", success);
+
       // Solo actualizar position si flyTo falla como respaldo
       if (!success) {
-        console.log('flyTo falló, usando setPosition como respaldo');
+        console.log("flyTo falló, usando setPosition como respaldo");
         setPosition([jjvv.lat, jjvv.lng]);
       }
     }
-    
+
     // Mantener el valor del filtro con el nombre de la junta seleccionada
     setFiltroNombreJJVV(jjvv.nombre);
-    
+
     // Actualizar input para reflejar la selección
     setInputValue(jjvv.nombre);
-    
+
     setShowDropdown(false);
   };
 

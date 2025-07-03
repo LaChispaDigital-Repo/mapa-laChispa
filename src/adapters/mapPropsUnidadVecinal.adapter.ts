@@ -1,11 +1,11 @@
-import type { UVProperties, UnidadVecinal } from "../types/region-selector.inteface";
+import type { UVProperties, UnidadVecinal } from "../types/interfaces";
 
 export const mapPropsToUnidadVecinalAdapter = (props: UVProperties): UnidadVecinal => ({
   id: props.id_uv,
   nombre: props.nombre_uv,
   numero: props.numero_uv,
   id_comuna: props.id_comuna,
-  geometry: null, // o props.geometry si la incluyes en el feature
+  geometry: null,
   datos_demograficos: {
     tot_personas: props.tot_personas ?? null,
     tot_hombres: props.tot_hombres ?? null,

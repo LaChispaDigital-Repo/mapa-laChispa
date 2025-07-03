@@ -4,7 +4,7 @@ import { RegionSelector } from "./RegionSelector";
 import { UnidadVecinalSelector } from "./UnidadVecinalSelector";
 import { FiltroJJVV } from "./FiltroJJVV";
 import { ProvinceSelector } from "./ProvinceSelector";
-import { AddressSearch } from "./AdressSearch";
+import { AddressSearch } from "./AddressSearch";
 
 export const FilterBar = () => {
   const clearFilters = useMapStore((state) => state.clearFilters);

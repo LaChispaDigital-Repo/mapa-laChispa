@@ -34,6 +34,8 @@ export const MapView = () => {
   const juntasVecinos = useMapStore((state) => state.juntasVecinos);
   const selectedCommune = useMapStore((state) => state.selectedCommune);
   const loading = useMapStore((state) => state.loading);
+  const searchPosition = useMapStore((state) => state.searchPosition);
+  const searchAddress = useMapStore((state) => state.searchAddress);
 
   return (
     <div className="map-container">
@@ -73,6 +75,17 @@ export const MapView = () => {
               Lat: {selectedRegion.centroide[0].toFixed(4)}
               <br />
               Lon: {selectedRegion.centroide[1].toFixed(4)}
+            </Popup>
+          </Marker>
+        )}
+
+        {/* Buscador de dirección */}
+        {searchPosition && (
+          <Marker position={searchPosition as LatLngExpression}>
+            <Popup>
+              <strong>📍 Dirección:</strong>
+              <br />
+              {searchAddress || "Dirección no disponible"}
             </Popup>
           </Marker>
         )}

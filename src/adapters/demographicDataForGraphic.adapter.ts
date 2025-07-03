@@ -1,4 +1,4 @@
-import type { AdaptedGraphicData, DatosDemograficos } from "../types/region-selector.inteface";
+import type { AdaptedGraphicData, DatosDemograficos } from "../types/interfaces";
 
 export function adaptDemographicDataForPieGraphic(data: DatosDemograficos): AdaptedGraphicData[] {
   try {

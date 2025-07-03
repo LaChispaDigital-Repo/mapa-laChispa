@@ -1,5 +1,5 @@
-import type { RegionGeoData } from "../types/region-selector.inteface";
-import type { UnidadVecinalGeoJSON, UVProperties } from "../types/region-selector.inteface";
+import type { RegionGeoData } from "../types/interfaces";
+import type { UnidadVecinalGeoJSON, UVProperties } from "../types/interfaces";
 
 /**
  * Adapta los datos crudos de Supabase a la estructura esperada por el frontend
@@ -43,15 +43,15 @@ function adaptUnidadVecinal(uv: any) {
 
 function adaptJuntaVecinal(junta: any) {
   // Añadir log para depurar los campos disponibles en los datos crudos
-  console.log('Datos crudos de junta:', {
+  console.log("Datos crudos de junta:", {
     id: junta.id,
     nombre: junta.nombre,
     lat: junta.lat,
     lng: junta.lng,
     lon: junta.lon,
-    campos_disponibles: Object.keys(junta)
+    campos_disponibles: Object.keys(junta),
   });
-  
+
   return {
     id: junta.id,
     lat: junta.lat,
@@ -60,7 +60,7 @@ function adaptJuntaVecinal(junta: any) {
     direccion: junta.direccion,
     geometry: junta.geometry || null,
   };
-} // Asegurarse de que geometry sea null si no existe
+}
 
 function adaptDatosDemograficos(datos: any) {
   return {
