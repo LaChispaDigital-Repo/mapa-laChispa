@@ -3,7 +3,7 @@ import { useMapStore } from "../../store/useMapStore";
 
 export const AddressSearch = () => {
   const [query, setQuery] = useState("");
-  const { setPosition, setSearchPosition } = useMapStore();
+  const { setPosition, setSearchPosition, setSearchAddress } = useMapStore();
 
   const handleSearch = async () => {
     if (!query.trim()) return;
@@ -13,6 +13,8 @@ export const AddressSearch = () => {
     if (data.length > 0) {
       const { lat, lon } = data[0];
       const newPos: [number, number] = [parseFloat(lat), parseFloat(lon)];
+      const displayName = data[0].display_name; // texto completo de la dirección
+      setSearchAddress(displayName);
       setPosition(newPos); // centra el mapa
       setSearchPosition(newPos); // guarda el pin
     }

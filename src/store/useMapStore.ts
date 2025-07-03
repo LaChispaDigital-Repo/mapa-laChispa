@@ -1,7 +1,7 @@
 import { create } from "zustand";
-import type { RegionGeoData, Comuna, UnidadVecinal, DatosDemograficos } from "../types/region-selector.inteface";
+import type { RegionGeoData, Comuna, UnidadVecinal, DatosDemograficos } from "../types/interfaces";
 import type { MapStore } from "./map-store.interface";
-import { calculateCentroid } from "./calculate.centroid.helper";
+import { calculateCentroid } from "../utils/calculate.centroid.helper";
 import { fetchRegionGeoData, fetchRegions } from "../utils/regionFetcher";
 import { toGeoJSON } from "../adapters/supabase.adapter";
 import {
@@ -16,63 +16,6 @@ export const useMapStore = create<MapStore>((set, get) => ({
   juntasVecinos: [],
   filteredJuntasVecinos: [],
   selectedJuntaVecinal: null,
-
-  // Refactorizar, desacoplar lógica Erick
-
-  // --------------------------------------------------------------------------
-
-  // Métodos para manipular la referencia al mapa
-  setMapInstance: (map: any) => {
-    mapInstance = map;
-    console.log("Mapa registrado en store", !!mapInstance);
-    if (mapInstance) {
-      console.log("Mapa disponible con métodos:", Object.getOwnPropertyNames(mapInstance));
-      console.log("flyTo disponible:", typeof mapInstance.flyTo);
-    }
-  },
-
-  getMapInstance: () => {
-    console.log("Solicitando instancia de mapa:", !!mapInstance);
-    return mapInstance;
-  },
-
-  // Método para centrar el mapa en coordenadas específicas
-  flyToLocation: (lat: number, lng: number, zoom: number = 16) => {
-    console.log("flyToLocation llamado con:", lat, lng, zoom);
-    console.log("mapInstance disponible:", !!mapInstance);
-
-    if (mapInstance) {
-      console.log("Tipo de mapInstance:", typeof mapInstance);
-      console.log("Métodos disponibles en mapa:", Object.getOwnPropertyNames(mapInstance));
-      console.log("flyTo existe:", "flyTo" in mapInstance);
-      console.log("Tipo de flyTo:", typeof mapInstance.flyTo);
-    }
-
-    if (mapInstance && typeof mapInstance.flyTo === "function") {
-      console.log("Ejecutando flyTo a:", lat, lng, "con zoom:", zoom);
-      try {
-        mapInstance.flyTo([lat, lng], zoom, {
-          animate: true,
-          duration: 1.5,
-        });
-        console.log("flyTo ejecutado exitosamente");
-        return true;
-      } catch (error) {
-        console.error("Error en flyTo:", error);
-        return false;
-      }
-    } else {
-      console.warn("No se puede volar: mapa no disponible o flyTo no es función");
-      console.warn("mapInstance:", mapInstance);
-      if (mapInstance) {
-        console.warn("flyTo method:", mapInstance.flyTo);
-      }
-      return false;
-    }
-  },
-
-  // -----------------------------------------------------------
-
   regionList: [],
   regionGeoJSON: null,
   selectedRegion: null,
@@ -90,6 +33,7 @@ export const useMapStore = create<MapStore>((set, get) => ({
   pieData: [],
   barData: [],
   searchPosition: null,
+  searchAddress: null,
 
   setSelectedProvince: (province) =>
     set({ selectedProvince: province, selectedCommune: null, selectedUnidadVecinal: null }),
@@ -100,6 +44,7 @@ export const useMapStore = create<MapStore>((set, get) => ({
   setFilteredJuntasVecinos: (juntas) => set({ filteredJuntasVecinos: juntas }),
   setSelectedJuntaVecinal: (junta) => set({ selectedJuntaVecinal: junta }),
   setSearchPosition: (pos: any) => set({ searchPosition: pos }),
+  setSearchAddress: (address: string) => set({ searchAddress: address }),
 
   setRegionGeoJSON: (geoJSON) =>
     set((state) => ({
@@ -250,6 +195,8 @@ export const useMapStore = create<MapStore>((set, get) => ({
       selectedCommune: null,
       selectedUnidadVecinal: null,
       selectedJuntaVecinal: null,
+      searchPosition: null,
+      searchAddress: null,
       regionGeoJSON: null,
       regionRawData: null,
       juntasVecinos: [],
@@ -260,6 +207,33 @@ export const useMapStore = create<MapStore>((set, get) => ({
       pieData: [],
       barData: [],
     }),
+
+  // Métodos para manipular la referencia al mapa
+  setMapInstance: (map: any) => {
+    mapInstance = map;
+  },
+
+  getMapInstance: () => {
+    return mapInstance;
+  },
+
+  // Método para centrar el mapa en coordenadas específicas
+  flyToLocation: (lat: number, lng: number, zoom: number = 16) => {
+    if (mapInstance && typeof mapInstance.flyTo === "function") {
+      try {
+        mapInstance.flyTo([lat, lng], zoom, {
+          animate: true,
+          duration: 1.5,
+        });
+        return true;
+      } catch (error) {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  },
+  // -----------------------------------------------------------
 }));
 
 export { calculateCentroid };

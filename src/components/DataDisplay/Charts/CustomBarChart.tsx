@@ -1,5 +1,5 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import type { AdaptedGraphicData } from "../../../types/region-selector.inteface";
+import type { AdaptedGraphicData } from "../../../types/interfaces";
 
 interface CustomBarChartProps {
   data: AdaptedGraphicData[];

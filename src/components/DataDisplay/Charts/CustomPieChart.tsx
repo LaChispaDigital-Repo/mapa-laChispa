@@ -1,5 +1,5 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
-import type { AdaptedGraphicData } from "../../../types/region-selector.inteface";
+import type { AdaptedGraphicData } from "../../../types/interfaces";
 
 interface CustomPieChartProps {
   data: AdaptedGraphicData[];

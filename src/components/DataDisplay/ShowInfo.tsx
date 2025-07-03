@@ -25,7 +25,6 @@ export const ShowInfo = () => {
     return (
       <div className="flex flex-col items-center justify-center h-full p-10 text-center text-gray-700">
         <h1 className="text-2xl font-semibold">Actualmente no existen datos para la selección</h1>
-        {/* <p className="m-5 p-5 text-gray-500 border border-dashed">Aquí se mostrará la información demográfica.</p> */}
       </div>
     );
   }
@@ -40,10 +39,10 @@ export const ShowInfo = () => {
   }
   return (
     <div className="flex flex-col h-full">
-      <h1 className="text-black text-center text-1xl lg:py-3 sm:py-2 sm:my-2">{title}</h1>
-      <div className="grid not-[]:w-full px-5 gap-6">
+      <h1 className="text-black text-center text-1xl lg:py-1 sm:py-1 sm:my-1">{title}</h1>
+      <div className="grid not-[]:w-full px-5 gap-5">
         <div className="grid grid-cols-1">
-          <div className="flex flex-col gap-4 justify-center items-center">
+          <div className="flex flex-col gap-2 justify-center items-center">
             <strong className="text-1xl font-semibold text-gray-700 text-center">Total de personas</strong>
             <h1 className="text-2xl font-bold text-blue-600">{totalPeople}</h1>
           </div>

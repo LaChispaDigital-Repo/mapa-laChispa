@@ -1,6 +1,6 @@
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
-import type { DatosDemograficos } from "../../types/region-selector.inteface";
+import type { DatosDemograficos } from "../../types/interfaces";
 
 interface ExcelExportButtonProps {
   data: DatosDemograficos;
