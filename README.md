@@ -1,5 +1,7 @@
 # Mapa Interactivo La Chispa
 
+olo 
+
 Una aplicación de mapa interactivo diseñada para visualizar datos geográficos relevantes El proyecto está construido con React, TypeScript y Vite, utilizando React-Leaflet para la renderización de mapas.
 
 ## Funcionalidades Actuales
