@@ -32,10 +32,26 @@ export const FilterBar = () => {
 
       {/* Desktop: Grid layout */}
       <div className="hidden lg:grid lg:grid-cols-7 lg:gap-2 items-center">
-        <RegionSelector />
-        <ProvinceSelector />
-        <CommuneSelector />
-        <UnidadVecinalSelector />
+        <div className="flex flex-col gap-1">
+    	  <label className="text-sm font-medium">Región</label>
+    	  <RegionSelector />
+  	</div>
+  	
+        <div className="flex flex-col gap-1">
+    	  <label className="text-sm font-medium">Provincia</label>
+    	  <ProvinceSelector />
+  	</div>
+  	
+        <div className="flex flex-col gap-1">
+    	  <label className="text-sm font-medium">Comuna</label>
+    	  <CommuneSelector />
+  	</div>
+  
+  	<div className="flex flex-col gap-1">
+    	  <label className="text-sm font-medium">Unidad Vecinal</label>
+    	  <UnidadVecinalSelector />
+  	</div>
+        
         <FiltroJJVV />
         <AddressSearch />
         <button onClick={clearFilters()} className="btn btn-info">
