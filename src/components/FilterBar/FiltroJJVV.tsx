@@ -1,6 +1,5 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useMapStore } from "../../store/useMapStore";
-import type { JuntaVecinal as JJVV } from "../../types/interfaces";
 
 export const FiltroJJVV: React.FC = () => {
   const juntaVecinalList = useMapStore((state) => state.juntasVecinos);
