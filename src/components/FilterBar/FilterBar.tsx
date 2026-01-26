@@ -51,9 +51,17 @@ export const FilterBar = () => {
     	  <label className="text-sm font-medium">Unidad Vecinal</label>
     	  <UnidadVecinalSelector />
   	</div>
-        
-        <FiltroJJVV />
-        <AddressSearch />
+  	
+  	<div className="flex flex-col gap-1">
+    	  <label className="text-sm font-medium">Junta vecinal</label>
+    	  <FiltroJJVV />
+  	</div>
+  	
+  	<div className="flex flex-col gap-1">
+    	  <label className="text-sm font-medium">Dirección</label>
+    	  <AddressSearch />
+  	</div>
+
         <button onClick={clearFilters()} className="btn btn-info">
           Limpiar selección
         </button>
