@@ -4,6 +4,7 @@ import type { MapStore } from "./map-store.interface";
 import { calculateCentroid } from "../utils/calculate.centroid.helper";
 import { fetchRegionGeoData, fetchRegions } from "../utils/regionFetcher";
 import { toGeoJSON } from "../adapters/supabase.adapter";
+import { supabase } from "../supabaseClient";
 import {
   adaptDemographicDataForPieGraphic,
   adaptDemographicDataForBarGraphic,
@@ -34,6 +35,8 @@ export const useMapStore = create<MapStore>((set, get) => ({
   barData: [],
   searchPosition: null,
   searchAddress: null,
+  sourceDate: null,
+  extractDate: null,
 
   setSelectedProvince: (province) =>
     set({ selectedProvince: province, selectedCommune: null, selectedUnidadVecinal: null }),
@@ -45,6 +48,8 @@ export const useMapStore = create<MapStore>((set, get) => ({
   setSelectedJuntaVecinal: (junta) => set({ selectedJuntaVecinal: junta }),
   setSearchPosition: (pos: any) => set({ searchPosition: pos }),
   setSearchAddress: (address: string) => set({ searchAddress: address }),
+  setSourceDate: (date: string | null) => set({ sourceDate: date }),
+  setExtractDate: (date: string | null) => set({ extractDate: date }),
 
   setRegionGeoJSON: (geoJSON) =>
     set((state) => ({
@@ -185,6 +190,31 @@ export const useMapStore = create<MapStore>((set, get) => ({
       set({ regionGeoJSON: null, regionRawData: null });
     } finally {
       setLoading(false);
+    }
+  },
+
+  loadDates: async (id_comuna: string) => {
+    try {
+      // Obtener las fechas de la comuna específica
+      const { data, error } = await supabase
+        .from('comunas')
+        .select('source_date, extract_date')
+        .eq('id_comuna', id_comuna)
+        .single();
+
+      if (error) {
+        console.error('Error cargando fechas:', error);
+        return;
+      }
+
+      if (data) {
+        set({ 
+          sourceDate: data.source_date,
+          extractDate: data.extract_date 
+        });
+      }
+    } catch (error) {
+      console.error('Error cargando fechas:', error);
     }
   },
 

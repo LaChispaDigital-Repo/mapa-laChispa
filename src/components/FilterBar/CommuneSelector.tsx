@@ -10,6 +10,7 @@ export const CommuneSelector = () => {
   const setGraphicData = useMapStore((state) => state.setDemographicData);
   const regionGeoJSON = useMapStore((state) => state.regionGeoJSON);
   const setJuntasVecinos = useMapStore((state) => state.setJuntasVecinos);
+  const loadDates = useMapStore((state) => state.loadDates);
 
   // Usar el getter optimizado
   const getComunas = useMapStore((state) => state.getComunas);
@@ -21,6 +22,11 @@ export const CommuneSelector = () => {
     setSelectedCommune(selectedCommune);
     setGraphicData(selectedCommune?.datos_demograficos || null);
     setJuntasVecinos(selectedCommune?.juntas_vecinos || []);
+
+    // Cargar las fechas cuando se selecciona una comuna
+    if (communeId) {
+      loadDates(communeId);
+    }
 
     if (communeId) {
       try {

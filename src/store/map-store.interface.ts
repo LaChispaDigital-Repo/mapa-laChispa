@@ -32,6 +32,8 @@ export interface MapStore {
   barData: any[];
   searchPosition: [number, number] | null;
   searchAddress: string | null;
+  sourceDate: string | null;
+  extractDate: string | null;
 
   // Getters
 
@@ -59,6 +61,8 @@ export interface MapStore {
   setSelectedJuntaVecinal: (junta: JuntaVecinal | null) => void;
   setSearchPosition: (pos: [number, number] | null) => void;
   setSearchAddress: (direction: string) => void;
+  setSourceDate: (date: string | null) => void;
+  setExtractDate: (date: string | null) => void;
 
   // Métodos para manipular el mapa directamente
   setMapInstance: (map: any) => void;
@@ -68,5 +72,6 @@ export interface MapStore {
   // Async Actions
   loadRegions: () => Promise<void>;
   loadRegionGeoJSON: () => Promise<void>;
+  loadDates: (id_comuna: string) => Promise<void>;
   clearFilters(): () => void;
 }
