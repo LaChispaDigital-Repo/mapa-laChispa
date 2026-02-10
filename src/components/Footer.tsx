@@ -26,6 +26,7 @@ export const Footer: React.FC = () => {
       <div className="">
         <p>Fecha de los datos: {formatDate(sourceDate)}</p>
         <span>Fecha última actualización de la página: {formatDate(extractDate)}</span>
+        <span>Fuente: Instituto Nacional de Estadisticas</span>
       </div>
       <p>© 2025 La Chispa Digital. Todos los derechos reservados.</p>
       <div className="col-span-1 ">{demographicData && <ExcelExportButton data={demographicData} title={title} />}</div>
